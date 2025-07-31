@@ -9,8 +9,8 @@ conda create -n tde python=3.8
 pip install -r requirement.txt
 ```
 
- Downloads [CBAM-HRNet weight] (https://drive.google.com/file/d/1Rd3xevgJqsDL4Gs3WgihZrkgaxSJlVuB/view?usp=sharing)
- Downloads [TDE weight] (https://drive.google.com/file/d/1ODmtd1NewZJtJvuueSjOYvP8qEBKzLoV/view?usp=sharing)
+ Downloads [CBAM-HRNet weight](https://drive.google.com/file/d/1Rd3xevgJqsDL4Gs3WgihZrkgaxSJlVuB/view?usp=sharing)
+ Downloads [TDE weight](https://drive.google.com/file/d/1ODmtd1NewZJtJvuueSjOYvP8qEBKzLoV/view?usp=sharing)
 
 
 
