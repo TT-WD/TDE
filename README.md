@@ -18,15 +18,11 @@ pip install -r requirement.txt
 
 
 ## 2. run gradio-demo
+put CBAM-HRNet weight to ./CBAM-HRNet-Detection/pth_dir
+put TDE weight to ./zoe-tooth-distance/tooth_check
 
 ```
-    put CBAM-HRNet weight to ./CBAM-HRNet-Detection/pth_dir
-    put TDE weight to ./zoe-tooth-distance/tooth_check
-    then:
-       python gradio_app.py
+ python gradio_app.py
     
-       
-    
-   
 ```
 
