@@ -79,10 +79,10 @@ def draw_keypoints(image_bgr, keypoints):
             cv2.line(img, (x1, y1), (x, y), (0, 0, 255), thickness)
     return img
 
-def draw_distances(image_bgr, keypoints, distances):
+def draw_distances(image_bgr, keypoints, distances,font_color):
     img = image_bgr.copy()
     h, w = img.shape[:2]
-    font_scale = max(h, w) / 1024
+    font_scale = max(h, w) / 1500
     font_thickness = int(1.5 * font_scale)
     if keypoints.shape[1] == 4:
         keypoints=keypoints.reshape(-1,2)
@@ -90,31 +90,32 @@ def draw_distances(image_bgr, keypoints, distances):
         pt1 = tuple(map(int, keypoints[i]))
         pt2 = tuple(map(int, keypoints[i + 1]))
         mid = ((pt1[0] + pt2[0]) // 2, (pt1[1] + pt2[1]) // 2)
-        text = f"{distances[i//2]:.2f} mm"
-        cv2.putText(img, text, mid, cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 0, 0), font_thickness, cv2.LINE_AA)
+        text = f"{distances[i//2]:.2f}mm"
+        cv2.putText(img, text, mid, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_color, font_thickness, cv2.LINE_AA)
     return img
 
 # ================= Gradio 主逻辑 =================
 import gradio as gr
 def main():
     with gr.Blocks() as demo:
-        gr.Markdown("# 牙齿关键点检测 & 距离估计")
+        gr.Markdown("# Tooth landmark detection & Distance Estimate")
 
         with gr.Row():
-            input_img = gr.Image(label="上传牙齿图像", type="numpy")
-            keypoint_img = gr.Image(label="关键点检测结果", type="numpy")
-            distance_img = gr.Image(label="距离标注结果", type="numpy")
+            input_img = gr.Image(label="upload_img", type="numpy")
+            keypoint_img = gr.Image(label="landmark detection", type="numpy")
+            distance_img = gr.Image(label="distance estimate", type="numpy")
 
-        btn_detect = gr.Button("1️⃣ 检测关键点")
-        btn_distance = gr.Button("2️⃣ 计算距离")
+        btn_detect = gr.Button("1️⃣ Detect landmark")
+        btn_distance = gr.Button("2️⃣ Estimate distance")
 
         # 用于存储关键点数据
         keypoints_state = gr.State()
 
         # 第一步：检测关键点
         def step1(image):
-            keypoints = run_hrnet(image)
-            img_with_points = draw_keypoints(cv2.cvtColor(image, cv2.COLOR_RGB2BGR), keypoints)
+            input_img=cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            keypoints = run_hrnet(input_img)
+            img_with_points = draw_keypoints(input_img, keypoints)
             img_with_points = cv2.cvtColor(img_with_points, cv2.COLOR_BGR2RGB)
             keypoints_json=json.dumps(keypoints.tolist())
             return img_with_points, keypoints_json
@@ -122,13 +123,15 @@ def main():
         btn_detect.click(step1, inputs=input_img, outputs=[keypoint_img,keypoints_state])
 
         # 第二步：计算距离
-        def step2(image, keypoints_json):
+        def step2(origin_image, keypoints_json):
             if keypoints_json is None:
                 return None
             keypoints = np.array(json.loads(keypoints_json),dtype=np.int32)
             keypoints=keypoints.reshape(-1, 4)
-            distances = run_zoe(image,keypoints)
-            img_with_dist = draw_distances(cv2.cvtColor(image, cv2.COLOR_RGB2BGR), keypoints, distances)
+            input_img = cv2.cvtColor(origin_image, cv2.COLOR_RGB2BGR)
+            distances = run_zoe(input_img,keypoints)
+            img_with_point= draw_keypoints(input_img,keypoints.reshape(-1,2))
+            img_with_dist = draw_distances(img_with_point, keypoints, distances,font_color=(0,0,0))
             img_with_dist = cv2.cvtColor(img_with_dist, cv2.COLOR_BGR2RGB)
             return img_with_dist
 
