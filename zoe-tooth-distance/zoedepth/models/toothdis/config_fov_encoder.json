@@ -1,0 +1,28 @@
+{
+  "fov_encoder": {
+            "in_chans": 3,
+            "embed_dim": 1024,
+            "encoder_feature_layer_ids": [5, 11, 17, 23],
+            "encoder_feature_dims": [256, 512, 1024, 1024],
+            "img_size": [256,384],
+            "patch_size": 16,
+            "timm_preset": "vit_large_patch14_dinov2",
+            "timm_img_size": 518,
+            "timm_patch_size": 14,
+            "window_size": 8,
+
+            "denorm": true,
+            "fuse_channels": [256,256,256,256,256],
+            "vit_model" : "resnet34_refine",
+            "resnet_type": "resnet34",
+            "depth_num_features": 256,
+            "fov_num_features": 512,
+            "freeze_config": {
+              "freeze_fov_encoder": false,
+              "freeze_fov_head": false,
+              "freeze_crowd_head": false
+            }
+
+  }
+
+}

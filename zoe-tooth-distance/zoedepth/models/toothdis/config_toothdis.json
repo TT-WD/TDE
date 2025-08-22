@@ -1,0 +1,197 @@
+{
+    "model": {
+        "name": "ToothDis",
+        "depth_model": "zoedepth",
+        "version_name": "v1",
+        "n_bins": 64,
+        "bin_embedding_dim": 128,
+        "bin_centers_type": "softplus",
+        "n_attractors":[16, 8, 4, 1],
+        "attractor_alpha": 1000,
+        "attractor_gamma": 2,
+        "attractor_kind" : "mean",
+        "attractor_type" : "inv",
+        "midas_model_type" : "DPT_BEiT_L_384",
+        "min_temp": 0.0212,
+        "max_temp": 50.0,
+        "output_distribution": "logbinomial",
+        "memory_efficient": true,
+        "inverse_midas": false,
+        "img_size": [256, 384],
+        "need_data_prepare": false,
+        "fuse_period": "early",
+        "config_for_oneTooth": {
+            "tooth_flag": "T",
+            "loss_for_oneTooth": true,
+            "save_loss_for_oneTooth": true,
+            "cagrad_for_oneTooth": false
+
+        },
+        "crowd_label_type": "hard",
+        "loss_for_proper": false,
+        "loss_for_archLength": false,
+        "loss_for_existed": false,
+        "loss_for_crowd": false,
+        "crowd_loss_type": "regression",
+        "distance_head_config": {
+            "distance_head_type": "mlp",
+            "distance_type": "ABS",
+            "point_pair_type": "sum",
+            "mlp_dis_head_input_dim": 2273,
+            "mlp_dis_head_hidden_dim": 1024,
+            "mlp_head_num": 1,
+            "output_dim": 1,
+            "drop_ratio": 0,
+
+            "origin_dim": 2273,
+            "token_dim": 1024,
+            "num_tokens": 12,
+            "hidden_dim": 2048,
+            "num_layers": 3,
+            "num_heads": 4
+        }
+    },
+    
+    "train": {
+        "train_midas": false,
+        "use_pretrained_midas": false,
+        "trainer": "tooth_distance",
+        "epochs": 200,
+        "bs": 20,
+        "crowd_config": {
+            "crowd_weight": [0.0836,0.4103,1],
+            "loss_gamma": 3
+
+        },
+
+        "optim_kwargs": {"lr": 0.005, "wd": 0.01,
+            "optimizer_type": "AdamW",
+            "depth_lr": 0.0002,
+            "fov_encoder_lr": 0.0002,
+            "distance_head_lr": 0.002,
+            "momentum": 0.9
+        },
+        "sched_kwargs": {"scheduler_type": "CosineAnnealingWarmupLR","div_factor": 10, "final_div_factor": 10000, "pct_start": 0.03, "three_phase":false, "cycle_momentum": true},
+        "same_lr": false,
+        "w_si": 1,
+        "w_domain": 0.2,
+        "w_reg": 0,
+        "w_grad": 0,
+        "avoid_boundary": false,
+        "random_crop": false,
+        "midas_lr_factor": 1,
+        "encoder_lr_factor":10,
+        "pos_enc_lr_factor":10,
+        "freeze_midas_bn": true,
+        "pretrained_resource" : "local::~/.cache/torch/hub/checkpoints/ZoeD_M12_N.pt",
+        "data_dir": "./dataset/total",
+        "data_dir_U": "./dataset/total_U",
+        "data_dir_L": "./dataset/total_L",
+        "data_dir_val": "./dataset/val",
+        "cache_all": true,
+        "aug_config": {
+            "point_offset_aug": false,
+            "aug_prob": 0.5,
+            "offset_radius": 4
+        },
+
+        "tooth_distance_range": {
+            "one_tooth_min_U": [8,5,6,5,4,5,5,4,6,6,5,8],
+            "one_tooth_max_U": [13,10,10,10,10,11,11,9,10,10,9,13],
+            "one_tooth_min_L": [8,6,5,5,4,4,4,4,5,6,6,9],
+            "one_tooth_max_L": [14,9,10,9,8,7,7,8,9,10,10,14],
+            "one_tooth_min_T": [8,5,5,5,4,4,4,4,5,6,6,8],
+            "one_tooth_max_T": [14,10,10,10,10,11,11,9,10,10,9,13],
+            "arch_length_min_U": [36],
+            "arch_length_max_U": [49],
+            "arch_length_min_L": [33],
+            "arch_length_max_L": [51],
+            "arch_length_min_T": [33],
+            "arch_length_max_T": [51]
+        },
+        "depth_select_model": false,
+        "depth_select_patch_size": 9,
+
+        "multi_task": true,
+        "use_dwa": true,
+        "feature_fuse_type": "add",
+        "freeze_config": {
+            "train_depth_model": true,
+            "train_fov_network": true,
+            "train_feature_fused_model": true,
+            "train_depth_select_model": true,
+            "train_distance_head": true
+        },
+
+
+        "train_dataset_k": {
+            "k_num": 6,
+            "batch_start_index": 4,
+            "batch_num": 5
+        }
+
+    },
+
+    "infer":{
+        "train_midas": false,
+        "use_pretrained_midas": false,
+        "pretrained_resource" : "local::~/.cache/torch/hub/checkpoints/ZoeD_M12_N.pt",
+        "force_keep_ar": true,
+        "cache_all": true,
+        "bs": 1,
+        "batch_size": 1,
+        "feature_fuse_type": "add",
+        "data_dir": "./dataset/total",
+        "data_dir_U": "./dataset/total_U",
+        "data_dir_L": "./dataset/total_L",
+        "data_dir_val": "./dataset/val",
+
+
+
+        "multi_task": true,
+        "use_dwa": true,
+
+        "tooth_distance_range": {
+            "one_tooth_min_U": [8,5,6,5,4,5,5,4,6,6,5,8],
+            "one_tooth_max_U": [13,10,10,10,10,11,11,9,10,10,9,13],
+            "one_tooth_min_L": [8,6,5,5,4,4,4,4,5,6,6,9],
+            "one_tooth_max_L": [14,9,10,9,8,7,7,8,9,10,10,14],
+            "one_tooth_min_T": [8,5,5,5,4,4,4,4,5,6,6,8],
+            "one_tooth_max_T": [14,10,10,10,10,11,11,9,10,10,9,13],
+            "arch_length_min_U": [36],
+            "arch_length_max_U": [49],
+            "arch_length_min_L": [33],
+            "arch_length_max_L": [51],
+            "arch_length_min_T": [33],
+            "arch_length_max_T": [51]
+        },
+
+
+
+        "train_dataset_k": {
+            "k_num": 6,
+            "batch_start_index": 5,
+            "batch_num": 5
+        },
+
+        "depth_select_model": false,
+        "freeze_config": {
+            "train_depth_model": true,
+            "train_fov_network": true,
+            "train_feature_fused_model": true,
+            "train_depth_select_model": true,
+            "train_distance_head": true
+        },
+        "aug_config": {
+            "point_offset_aug": true,
+            "aug_prob": 0.5,
+            "offset_radius": 4
+        }
+    },
+
+    "eval":{
+        "train_midas": false ,
+        "use_pretrained_midas": false,
+        "pretrained_resource" : "url::https://github.com/isl-org/ZoeDepth/releases/download/v1.0/ZoeD_M12_N.pt"
+    }
+}
